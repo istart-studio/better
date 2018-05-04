@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, FlatList, Button, Text, View} from "react-native";
+import {StyleSheet, FlatList, Button, Text, View, TouchableOpacity} from "react-native";
 import DrugService from "../service/drugService";
 
 export class HomeScreen extends React.Component {
@@ -23,6 +23,24 @@ export class HomeScreen extends React.Component {
         this.setState({todayDrugs: drugs});
         console.log(this.state.todayDrugs);
     }
+    _onPressItem = (item) => {
+        // if (id == null || id.trim() == "") return;
+        console.log('report item : ' + item);
+    };
+
+    _renderItem(rowItem) {
+        console.log(rowItem);
+        return (
+            <TouchableOpacity onPress={() => {
+                this._onPressItem(rowItem.item);
+            }}>
+                <View>
+                    <Text>药品名称：{rowItem.item.drugName}</Text>
+                    <Text>用量：{rowItem.item.dosage}</Text>
+                </View>
+            </TouchableOpacity>
+        );
+    }
 
     render() {
         const {navigate} = this.props.navigation;
@@ -36,7 +54,7 @@ export class HomeScreen extends React.Component {
                 />
                 <FlatList
                     data={this.state.todayDrugs}
-                    renderItem={({item}) => <Text style={styles.item}>{item.drugName}</Text>}
+                    renderItem={this._renderItem}
                 />
             </View>
         );
