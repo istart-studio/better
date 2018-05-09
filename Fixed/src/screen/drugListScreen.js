@@ -1,7 +1,7 @@
 import React from 'react';
 import {StyleSheet, FlatList, Button, Text, View, TouchableOpacity, ScrollView} from "react-native";
 import DrugService from "../service/drugService";
-import {ListRow, NavigationBar, Theme} from "teaset";
+import {Badge, Label, ListRow, NavigationBar, Theme} from "teaset";
 
 export class DrugListScreen extends React.Component {
 
@@ -18,7 +18,10 @@ export class DrugListScreen extends React.Component {
         super(props);
         this.state = {todayDrugs: []}
         this._loadingTodayDrugs = this._loadingTodayDrugs.bind(this);
-        DrugService.getTodayDrugs(this._loadingTodayDrugs);
+        this._renderItem = this._renderItem.bind(this);
+        DrugService.getTodayDrugs().then(drugs => {
+            this._loadingTodayDrugs(drugs);
+        });
     }
 
     componentDidMount() {
@@ -29,22 +32,29 @@ export class DrugListScreen extends React.Component {
         console.log("_loadingTodayDrugs");
         console.log(drugs);
         this.setState({todayDrugs: drugs});
-        console.log(this.state.todayDrugs);
+    }
+
+    _renderItemProps(rowItem) {
+        return (<View style={{flex: 1, flexDirection: 'row'}}>
+            <Badge type='square' style={{flex: 1,backgroundColor: 'blue'}} count='早'/>
+            <Badge style={{flex: 1,backgroundColor: '#777', paddingLeft: 0, paddingRight: 0}}>
+                <Text style={{color: '#fff'}}>{rowItem.item.dosage}10</Text>
+            </Badge>
+        </View>);
     }
 
     _renderItem(rowItem) {
-        console.log(rowItem);
+        var detail = this._renderItemProps(rowItem);
         return (
-            <ListRow title={rowItem.item.drugName}
-                     detail={<View>
-                         <Text>{rowItem.item.dosage}</Text>
-                         <Text>{rowItem.item.drugName}</Text>
-                     </View>}
+            <ListRow title={<Label style={{fontSize: 18, color: '#31708f'}} text={rowItem.item.drugName}/>}
+                     detail={detail}
                      swipeActions={[
-                         <ListRow.SwipeActionButton title='Cancel'/>,
-                         <ListRow.SwipeActionButton title='Remove' type='danger' onPress={() => alert('Remove')}/>,
+                         <ListRow.SwipeActionButton title='编辑'/>,
+                         <ListRow.SwipeActionButton title='移除' type='danger'
+                                                    onPress={() => alert('Remove')}/>,
                      ]}
-                     detailStyle={{fontSize: 15, color: '#31708f'}}/>
+                     detailStyle={{fontSize: 15, color: '#31708f'}}
+                     titlePlace='top'/>
         );
     }
 
@@ -52,7 +62,6 @@ export class DrugListScreen extends React.Component {
 
         return (
             <ScrollView style={{flex: 1}}>
-
                 <FlatList
                     data={this.state.todayDrugs}
                     renderItem={this._renderItem}

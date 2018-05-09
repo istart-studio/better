@@ -4,19 +4,22 @@ const KEY = "DRUGS";
 export default class DrugService {
 
     static async getDrugs() {
-        return await BaseStorage.get(KEY).then(value => {
+        var drugs =  await BaseStorage.get(KEY).then(value => {
             return JSON.parse(value);
         });
+        if (drugs == null || !Array.isArray(drugs)) {
+            drugs = [];
+        }
+        return drugs;
     }
 
     static async newDrugs(drug) {
         console.log(drug);
         var drugs = await this.getDrugs();
-        if (drugs == null) {
-            drugs = [];
-        }
+
         var isNewDrug = true;
         for (var i = 0; i < drugs.length; i++) {
+            console.log(drug.drugName);
             if (drugs[i].drugName == drug.drugName) {
                 isNewDrug = false;
                 break;
@@ -25,16 +28,12 @@ export default class DrugService {
         if (isNewDrug) {
             drugs.push(drug);
             console.log(drugs);
-            BaseStorage.save(KEY, drug);
+            BaseStorage.save(KEY, drugs);
         }
         return isNewDrug;
     }
 
-    static async getTodayDrugs(loadingFunc) {
-        var drugs = await this.getDrugs();
-        if (drugs == null) {
-            drugs = [];
-        }
-        loadingFunc(drugs);
+    static async getTodayDrugs() {
+        return this.getDrugs();
     }
 }

@@ -28,12 +28,14 @@ export default class AddDrugScreen extends React.Component {
 
 
     _onSaveDrug = () => {
-        var isNewDrug = DrugService.newDrugs(this.state);
-        if (isNewDrug) {
-            this.props.navigation.goBack();
-        } else {
-            Toast.fail('已添加过同名药品');
-        }
+        DrugService.newDrugs(this.state).then(function(isNewDrug) {
+            // here you can use the result of promiseB
+            if (isNewDrug) {
+                this.props.navigation.goBack();
+            } else {
+                Toast.fail('已添加过同名药品');
+            }
+        })
     }
 
 
