@@ -15,9 +15,19 @@ export default class DrugService {
         if (drugs == null) {
             drugs = [];
         }
-        drugs.push(drug);
-        console.log(drugs);
-        BaseStorage.save(KEY, drugs);
+        var isNewDrug = true;
+        for (var i = 0; i < drugs.length; i++) {
+            if (drugs[i].drugName == drug.drugName) {
+                isNewDrug = false;
+                break;
+            }
+        }
+        if (isNewDrug) {
+            drugs.push(drug);
+            console.log(drugs);
+            BaseStorage.save(KEY, drug);
+        }
+        return isNewDrug;
     }
 
     static async getTodayDrugs(loadingFunc) {

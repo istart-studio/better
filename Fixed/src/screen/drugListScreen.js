@@ -6,15 +6,12 @@ import {ListRow, NavigationBar, Theme} from "teaset";
 export class DrugListScreen extends React.Component {
 
     static navigationOptions = ({navigation}) => ({
-
-        header: <NavigationBar title='drugs'
-                               rightView={
-                                   <View style={{flexDirection: 'row'}}>
-                                       <NavigationBar.LinkButton title='ADD' onPress={() =>
-                                           navigation.navigate('AddDrug', {name: 'Jane'})
-                                       }/>
-                                   </View>
-                               }/>
+        headerRight: (
+            <Button
+                title='添加药品'
+                onPress={() => navigation.navigate('AddDrug', {name: 'Jane'})}
+            />
+        )
     });
 
     constructor(props) {
@@ -30,6 +27,7 @@ export class DrugListScreen extends React.Component {
 
     _loadingTodayDrugs = function (drugs) {
         console.log("_loadingTodayDrugs");
+        console.log(drugs);
         this.setState({todayDrugs: drugs});
         console.log(this.state.todayDrugs);
     }
@@ -53,7 +51,7 @@ export class DrugListScreen extends React.Component {
     render() {
 
         return (
-            <ScrollView style={{flex: 1, paddingTop: Theme.statusBarHeight + 45}}>
+            <ScrollView style={{flex: 1}}>
 
                 <FlatList
                     data={this.state.todayDrugs}
