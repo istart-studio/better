@@ -90,33 +90,22 @@ export default class AddDrugScreen extends React.Component {
                             <ListRow detail={
                                 <View style={styles.row}>
                                     <Input
-                                        style={{flex: 5}}
+                                        style={{flex: 4}}
                                         size='sm'
                                         onChangeText={(text) => this.setState({drugName: text})}
                                         value={this.state.text}
-                                        placeholder={"药品名称"}
+                                        placeholder={"药品厂商"}
                                     />
                                     <Label
                                         style={{flex: 1, paddingLeft: 2, paddingRight: 2}}
                                         size="sm"
                                         text=''/>
                                     <Input
-                                        style={{flex: 2}}
+                                        style={{flex: 3}}
                                         size='sm'
-                                        onChangeText={(text) => this.setState({props: {count: text}})}
-                                        value={this.state.props.count}
-                                        placeholder={"20"}
-                                    />
-                                    <Label
-                                        style={{paddingLeft: 2, paddingRight: 2}}
-                                        size="sm"
-                                        text='*'/>
-                                    <Input
-                                        style={{flex: 2}}
-                                        size='sm'
-                                        onChangeText={(text) => this.setState({props: {unit: text}})}
-                                        value={this.state.props.unit}
-                                        placeholder={"0.5mg"}
+                                        onChangeText={(text) => this.setState({drugName: text})}
+                                        value={this.state.text}
+                                        placeholder={"购买价格"}
                                     />
                                 </View>}/>
                         </ScrollView>
@@ -251,6 +240,6 @@ let styles = RkStyleSheet.create(theme => ({
         alignItems: 'center'
     },
     switch: {
-        marginVertical: 14
+        marginVertical: 5
     },
 }));
