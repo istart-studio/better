@@ -4,11 +4,12 @@ import {
 } from 'react-navigation';
 import {DrugListScreen} from "./src/screen/drugListScreen";
 import AddDrugScreen from "./src/screen/addDrugScreen";
-// import {Theme} from 'teaset';
+import {bootstrap} from "./src/config/bootstrap";
 
-// Theme.set({fitIPhoneX: true});
+
+bootstrap();
 const App = StackNavigator({
-    AddDrug: {screen: AddDrugScreen},
     DrugList: {screen: DrugListScreen},
+    AddDrug: {screen: AddDrugScreen},
 })
 export default App;
