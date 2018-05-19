@@ -7,12 +7,7 @@ import {RkText, RkStyleSheet, RkCard} from "react-native-ui-kitten";
 export class DrugListScreen extends React.Component {
 
     static navigationOptions = ({navigation}) => ({
-        headerRight: (
-            <Button
-                title='添加药品'
-                onPress={() => navigation.navigate('AddDrug', {name: 'Jane'})}
-            />
-        )
+        title:"药品管理"
     });
 
     constructor(props) {
@@ -32,7 +27,7 @@ export class DrugListScreen extends React.Component {
     _loadingTodayDrugs = function (drugs) {
         console.log("_loadingTodayDrugs");
         console.log(drugs);
-        this.setState({todayDrugs: drugs});
+        this.setState({todayDrugs: [{},{},{}]});
     }
 
     _renderItemProps(rowItem) {
@@ -49,21 +44,6 @@ export class DrugListScreen extends React.Component {
                 <Label style={styles.prop} type='title' size='xl' text='价格'/>
                 <Label style={styles.prop} type='title' size='xl' text='20'/>
             </View>
-            <View style={styles.propUnit}>
-                <Text style={styles.prop}>1111111</Text>
-                <Text style={styles.prop}>1111111</Text>
-                <Text style={styles.prop}>1111111</Text>
-                <Text style={styles.prop}>1111111</Text>
-                <Text style={styles.prop}>1111111</Text>                <Text style={styles.prop}>1111111</Text>
-                <Text style={styles.prop}>1111111</Text>
-                <Text style={styles.prop}>1111111</Text>
-                <Text style={styles.prop}>1111111</Text>
-                <Text style={styles.prop}>1111111</Text>
-                <Text style={styles.prop}>1111111</Text>
-                <Text style={styles.prop}>1111111</Text>
-                <Text style={styles.prop}>1111111</Text>
-
-            </View>
         </View>);
     }
 
@@ -76,6 +56,8 @@ export class DrugListScreen extends React.Component {
                 icon={require('../asserts/images/drug_default.png')}
                 detail={detail}
                 swipeActions={[
+                    <ListRow.SwipeActionButton title='编辑' type='warn'
+                                               onPress={() => alert('edit')}/>,
                     <ListRow.SwipeActionButton title='移除' type='danger'
                                                onPress={() => alert('Remove')}/>,
                 ]}
@@ -107,7 +89,7 @@ let styles = RkStyleSheet.create(theme => ({
     row: {
         flex: 1,
         flexDirection: 'columns',
-        marginVertical: 8,
+        marginVertical: 4,
     },
     propUnit: {
         flex: 1,
