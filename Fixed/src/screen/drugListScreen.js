@@ -7,7 +7,12 @@ import {RkText, RkStyleSheet, RkCard} from "react-native-ui-kitten";
 export class DrugListScreen extends React.Component {
 
     static navigationOptions = ({navigation}) => ({
-        title:"药品管理"
+        title: "药品管理",
+        tabBarIcon: ({tintColor,activeTintColor}) => (
+            <Image source={require('../asserts/images/drug_default.png')}
+                   style={{width: 16, height: 16, tintColor: tintColor, activeTintColor: activeTintColor}}
+            />
+        ),
     });
 
     constructor(props) {
@@ -27,7 +32,7 @@ export class DrugListScreen extends React.Component {
     _loadingTodayDrugs = function (drugs) {
         console.log("_loadingTodayDrugs");
         console.log(drugs);
-        this.setState({todayDrugs: [{},{},{}]});
+        this.setState({todayDrugs: [{}, {}, {}]});
     }
 
     _renderItemProps(rowItem) {
@@ -69,22 +74,23 @@ export class DrugListScreen extends React.Component {
     render() {
 
         return (
-            <View>
+            <ScrollView style={styles.container}>
+
                 <FlatList
-                    style={styles.container}
                     data={this.state.todayDrugs}
                     renderItem={this._renderItem}
                 />
-            </View>
+            </ScrollView>
         );
     }
 }
 
 let styles = RkStyleSheet.create(theme => ({
     container: {
-        backgroundColor: theme.colors.screen.scroll,
-        paddingVertical: 8,
-        paddingHorizontal: 14
+        flex: 1,
+        backgroundColor: 'white',
+        paddingTop: 65,
+        paddingHorizontal: 14,
     },
     row: {
         flex: 1,
@@ -101,13 +107,13 @@ let styles = RkStyleSheet.create(theme => ({
         paddingVertical: 5,
         marginVertical: 2,
         marginHorizontal: 5,
-        flexWrap:'wrap',
+        flexWrap: 'wrap',
 
     },
     prop: {
         flex: 1,
         color: '#8a6d3b',
         fontSize: 12,
-        flexWrap:'wrap'
+        flexWrap: 'wrap'
     }
 }));

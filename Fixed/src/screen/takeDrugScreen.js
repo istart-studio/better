@@ -7,7 +7,12 @@ import {RkText, RkStyleSheet, RkCard} from "react-native-ui-kitten";
 export class TakeDrugScreen extends React.Component {
 
     static navigationOptions = ({navigation}) => ({
-        title: "今日服用"
+        title: "今日服用",
+        tabBarIcon: ({tintColor,activeTintColor}) => (
+            <Image source={require('../asserts/images/take_drug_plan.png')}
+                   style={{width:16,height:16,tintColor:tintColor,activeTintColor:'#8a8a8a'}}
+            />
+        ),
     });
 
     constructor(props) {
@@ -72,22 +77,24 @@ export class TakeDrugScreen extends React.Component {
     render() {
 
         return (
-            <View>
+            <ScrollView
+                style={styles.container}>
+
                 <FlatList
-                    style={styles.container}
                     data={this.state.todayDrugs}
                     renderItem={this._renderItem}
                 />
-            </View>
+            </ScrollView>
         );
     }
 }
 
 let styles = RkStyleSheet.create(theme => ({
     container: {
-        backgroundColor: theme.colors.screen.scroll,
-        paddingVertical: 8,
-        paddingHorizontal: 14
+        flex: 1,
+        backgroundColor: 'white',
+        paddingTop: 65,
+        paddingHorizontal: 14,
     },
     row: {
         flex: 1,

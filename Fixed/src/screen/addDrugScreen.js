@@ -12,14 +12,19 @@ import {
  */
 export default class AddDrugScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
-        headerTitle: '添加新药',
+        title: '添加新药',
         headerRight: (
             <Button
                 title='完成'
                 onPress={() =>
                     navigation.state.params.navigatePress()}
             />
-        )
+        ),
+        tabBarIcon: ({tintColor, activeTintColor}) => (
+            <Image source={require('../asserts/images/new_drug.png')}
+                   style={{width: 16, height: 16, tintColor: tintColor, activeTintColor: activeTintColor}}
+            />
+        ),
     });
 
     constructor(props) {
@@ -155,7 +160,7 @@ export default class AddDrugScreen extends React.Component {
                                 </View>
                             }/>
                             <ListRow
-                                titleStyle={{width:16,height:16}}
+                                titleStyle={{width: 16, height: 16}}
                                 icon={require('../asserts/images/noon.png')}
                                 detail={
                                     <View style={styles.row}>
@@ -221,7 +226,6 @@ export default class AddDrugScreen extends React.Component {
                     </View>
 
                 </RkCard>
-
             </ScrollView>
         );
     }
@@ -230,8 +234,8 @@ export default class AddDrugScreen extends React.Component {
 let styles = RkStyleSheet.create(theme => ({
     container: {
         flex: 1,
-        backgroundColor: theme.colors.screen.scroll,
-        paddingVertical: 8,
+        backgroundColor: 'white',
+        paddingVertical: 45,
         paddingHorizontal: 14
     },
     card: {
