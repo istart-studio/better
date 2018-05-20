@@ -13,7 +13,5 @@ const App = StackNavigator({
     TakeDrug: {screen: TakeDrugScreen},
     AddDrug: {screen: AddDrugScreen},
     DrugList: {screen: DrugListScreen},
-
-
 })
 export default App;
