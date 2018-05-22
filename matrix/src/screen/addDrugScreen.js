@@ -1,11 +1,10 @@
 import React from 'react';
-import {ScrollView, Button, View, Text, StyleSheet, Image} from 'react-native';
-import DrugService from "../service/drugService";
-import {ListRow, Input, Toast, Checkbox, Label, Badge} from "teaset";
+import {Image, ScrollView, Text, View} from 'react-native';
+import DrugInfoModel from "../model/drugInfoModel";
+import DrugService from "../service/drugService"
+import {Button, Input, Label, ListRow, Toast} from "teaset";
 import {RkCard, RkStyleSheet} from "react-native-ui-kitten";
-import {
-    RkSwitch
-} from '../component';
+import {RkSwitch} from '../component';
 
 /**
  *
@@ -13,45 +12,133 @@ import {
 export default class AddDrugScreen extends React.Component {
     static navigationOptions = ({navigation}) => ({
         title: '添加新药',
-        headerRight: (
-            <Button
-                title='完成'
-                onPress={() =>
-                    navigation.state.params.navigatePress()}
-            />
-        ),
-        tabBarIcon: ({tintColor, activeTintColor}) => (
+        // headerRight: (
+        //     <Button
+        //         title='完成'
+        //         onPress={() =>
+        //             navigation.state.params.navigatePress()}
+        //     />
+        // ),
+        tabBarIcon: ({tintColor}) => (
             <Image source={require('../asserts/images/new_drug.png')}
-                   style={{width: 16, height: 16, tintColor: tintColor, activeTintColor: activeTintColor}}
+                   style={{width: 16, height: 16, tintColor: tintColor}}
             />
         ),
     });
 
     constructor(props) {
         super(props);
-        this.state = {
-            drugName: '',
-            dosage: {isMorning: true, isNoon: true, isNight: true},
-            props: {count: 0, unit: ''}
-        };
+        this.state = AddDrugScreen._initObject(props.navigation.state.drugInfo);
         this._onSaveDrug = this._onSaveDrug.bind(this);
+        this._changePlan = this._changePlan.bind(this);
         this.props.navigation.setParams({navigatePress: this._onSaveDrug})
+
+    }
+
+    static _initObject(rawObject) {
+        let drugInfo = rawObject;
+        if (!drugInfo) {
+            drugInfo = DrugInfoModel.newModel();
+            drugInfo.plan.push(DrugInfoModel.newPlan("09", 1, drugInfo.quantity));
+            drugInfo.plan.push(DrugInfoModel.newPlan("13", 1, drugInfo.quantity));
+            drugInfo.plan.push(DrugInfoModel.newPlan("19", 1, drugInfo.quantity));
+        }
+        return drugInfo;
     }
 
 
     _onSaveDrug = () => {
-        DrugService.newDrugs(this.state).then(function (isNewDrug) {
-            // here you can use the result of promiseB
+        let drugInfo = this.state;
+        if (drugInfo.drugName === "") {
+            Toast.fail('药品名必须填写');
+            return;
+        }
+        DrugService.newDrugs(drugInfo).then(function (isNewDrug) {
             if (isNewDrug) {
+                Toast.success('保存成功');
                 this.props.navigation.goBack();
             } else {
                 Toast.fail('已添加过同名药品');
             }
         })
+    };
+
+    _changePlan(element) {
+        this.state.plan.forEach(item => {
+            if (item.time === element.time) {
+                item.amount = element.amount;
+                item.quantity = element.quantity;
+                item.enable = element.enable;
+            }
+        });
+        this.setState({plan: this.state.plan});
     }
 
+    _renderPlanItem(element) {
+        let iconSrc = "";
+        if (element.time < 12) {
+            iconSrc = require("../asserts/images/morning.png");
+        } else if (element.time > 12 && element.time < 19) {
+            iconSrc = require("../asserts/images/noon.png");
+        } else {
+            iconSrc = require("../asserts/images/night.png");
+        }
+        return (<ListRow
+            key={element.time}
+            icon={iconSrc}
+            detail={
+                <View style={styles.row}>
+                    <Input
+                        style={{flex: 1}}
+                        size='sm'
+                        onChangeText={(text) => {
+                            element.amount = text;
+                            element.enable = parseFloat(element.amount) > 0;
+                            this._changePlan(element);
+                        }}
+                        keyboardType='numeric'
+                        value={String(element.amount)}
+                        placeholder={"每日用量"}
+                    />
+                    <Label
+                        style={{paddingLeft: 1, paddingRight: 2}}
+                        size="sm"
+                        text='*'/>
+                    <Input
+                        style={{flex: 1}}
+                        size='sm'
+                        onChangeText={(text) => {
+                            element.quantity = text;
+                            this._changePlan(element);
+                        }}
+                        value={element.quantity}
+                        placeholder={"0.5mg"}
+                    />
+                    <Label
+                        style={{flex: 1, paddingLeft: 2, paddingRight: 2}}
+                        size="sm"
+                        text=''/>
+                    <RkSwitch style={styles.switch}
+                              value={element.enable}
+                              name="Push"
+                              onValueChange={enable => {
+                                  element.enable = enable;
+                                  this._changePlan(element)
+                              }}/>
+                </View>
+            }/>);
+    }
+
+    _renderPlan() {
+        const planViews = [];
+        for (let i = 0; i < this.state.plan.length; i++) {
+            planViews.push(this._renderPlanItem(this.state.plan[i]));
+        }
+        return planViews;
+    }
 
     render() {
+        const _renderPlan = this._renderPlan();
         return (
             <ScrollView style={styles.container}>
                 <RkCard style={styles.card}>
@@ -69,18 +156,17 @@ export default class AddDrugScreen extends React.Component {
                                         style={{flex: 5}}
                                         size='sm'
                                         onChangeText={(text) => this.setState({drugName: text})}
-                                        value={this.state.text}
+                                        value={String(this.state.drugName)}
                                         placeholder={"药品名称"}
                                     />
                                     <Label
                                         style={{flex: 1, paddingLeft: 2, paddingRight: 2}}
-                                        size="sm"
-                                        text=''/>
+                                        size="sm"/>
                                     <Input
-                                        style={{flex: 2}}
+                                        style={{flex: 2, width: 10}}
                                         size='sm'
-                                        onChangeText={(text) => this.setState({props: {count: text}})}
-                                        value={this.state.props.count}
+                                        onChangeText={(text) => this.setState({amount: text})}
+                                        value={String(this.state.amount)}
                                         placeholder={"20"}
                                     />
                                     <Label
@@ -90,8 +176,8 @@ export default class AddDrugScreen extends React.Component {
                                     <Input
                                         style={{flex: 2}}
                                         size='sm'
-                                        onChangeText={(text) => this.setState({props: {unit: text}})}
-                                        value={this.state.props.unit}
+                                        onChangeText={(text) => this.setState({quantity: text})}
+                                        value={String(this.state.quantity)}
                                         placeholder={"0.5mg"}
                                     />
                                 </View>}/>
@@ -100,8 +186,8 @@ export default class AddDrugScreen extends React.Component {
                                     <Input
                                         style={{flex: 4}}
                                         size='sm'
-                                        onChangeText={(text) => this.setState({drugName: text})}
-                                        value={this.state.text}
+                                        onChangeText={(text) => this.setState({vendor: text})}
+                                        value={String(this.state.vendor)}
                                         placeholder={"药品厂商"}
                                     />
                                     <Label
@@ -111,8 +197,8 @@ export default class AddDrugScreen extends React.Component {
                                     <Input
                                         style={{flex: 3}}
                                         size='sm'
-                                        onChangeText={(text) => this.setState({drugName: text})}
-                                        value={this.state.text}
+                                        onChangeText={(text) => this.setState({price: text})}
+                                        value={String(this.state.price)}
                                         placeholder={"购买价格"}
                                     />
                                 </View>}/>
@@ -128,104 +214,14 @@ export default class AddDrugScreen extends React.Component {
                         <Text style={{fontSize: 16}}>用药计划</Text>
                     </View>
                     <View rkCardContent>
+
                         <ScrollView style={{flex: 1}}>
-                            <ListRow icon={require('../asserts/images/morning.png')} detail={
-                                <View style={styles.row}>
-                                    <Input
-                                        style={{flex: 1}}
-                                        size='sm'
-                                        onChangeText={(text) => this.setState({dosage: text})}
-                                        value={this.state.text}
-                                        placeholder={"每日用量"}
-                                    />
-                                    <Label
-                                        style={{paddingLeft: 1, paddingRight: 2}}
-                                        size="sm"
-                                        text='*'/>
-                                    <Input
-                                        style={{flex: 1}}
-                                        size='sm'
-                                        onChangeText={(text) => this.setState({dosage: text})}
-                                        value={this.state.props.unit}
-                                        placeholder={"0.5mg"}
-                                    />
-                                    <Label
-                                        style={{flex: 1, paddingLeft: 2, paddingRight: 2}}
-                                        size="sm"
-                                        text=''/>
-                                    <RkSwitch style={styles.switch}
-                                              value={this.state.sendPush}
-                                              name="Push"
-                                              onValueChange={(sendPush) => this.setState({sendPush})}/>
-                                </View>
-                            }/>
-                            <ListRow
-                                titleStyle={{width: 16, height: 16}}
-                                icon={require('../asserts/images/noon.png')}
-                                detail={
-                                    <View style={styles.row}>
-                                        <Input
-                                            style={{flex: 1}}
-                                            size='sm'
-                                            onChangeText={(text) => this.setState({dosage: text})}
-                                            value={this.state.text}
-                                            placeholder={"每日用量"}
-                                        />
-                                        <Label
-                                            style={{paddingLeft: 1, paddingRight: 2}}
-                                            size="sm"
-                                            text='*'/>
-                                        <Input
-                                            style={{flex: 1}}
-                                            size='sm'
-                                            onChangeText={(text) => this.setState({dosage: text})}
-                                            value={this.state.props.unit}
-                                            placeholder={"0.5mg"}
-                                        />
-                                        <Label
-                                            style={{flex: 1, paddingLeft: 2, paddingRight: 2}}
-                                            size="sm"
-                                            text=''/>
-                                        <RkSwitch style={styles.switch}
-                                                  value={this.state.sendPush}
-                                                  name="Push"
-                                                  onValueChange={(sendPush) => this.setState({sendPush})}/>
-                                    </View>
-                                }/>
-                            <ListRow icon={require('../asserts/images/night.png')} detail={
-                                <View style={styles.row}>
-                                    <Input
-                                        style={{flex: 1}}
-                                        size='sm'
-                                        onChangeText={(text) => this.setState({dosage: text})}
-                                        value={this.state.text}
-                                        placeholder={"每日用量"}
-                                    />
-                                    <Label
-                                        style={{paddingLeft: 1, paddingRight: 2}}
-                                        size="sm"
-                                        text='*'/>
-                                    <Input
-                                        style={{flex: 1}}
-                                        size='sm'
-                                        onChangeText={(text) => this.setState({dosage: text})}
-                                        value={this.state.props.unit}
-                                        placeholder={"0.5mg"}
-                                    />
-                                    <Label
-                                        style={{flex: 1, paddingLeft: 2, paddingRight: 2}}
-                                        size="sm"
-                                        text=''/>
-                                    <RkSwitch style={styles.switch}
-                                              value={this.state.sendPush}
-                                              name="Push"
-                                              onValueChange={(sendPush) => this.setState({sendPush})}/>
-                                </View>
-                            }/>
+                            {_renderPlan}
                         </ScrollView>
                     </View>
 
                 </RkCard>
+                <Button title='确认' onPress={() => this._onSaveDrug()}/>
             </ScrollView>
         );
     }
@@ -247,8 +243,6 @@ let styles = RkStyleSheet.create(theme => ({
     row: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        // paddingHorizontal: 17.5,
-        // borderBottomWidth: StyleSheet.hairlineWidth,
         borderColor: theme.colors.border.base,
         alignItems: 'center'
     },

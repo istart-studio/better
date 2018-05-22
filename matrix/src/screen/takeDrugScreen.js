@@ -1,16 +1,16 @@
 import React from 'react';
-import {StyleSheet, FlatList, Text, View, TouchableOpacity, ScrollView, Image} from "react-native";
+import {FlatList, Image, ScrollView, TouchableOpacity, View} from "react-native";
 import DrugService from "../service/drugService";
-import {Badge, Label, ListRow, Button, NavigationBar, Theme} from "teaset";
-import {RkText, RkStyleSheet, RkCard} from "react-native-ui-kitten";
+import {Label, ListRow} from "teaset";
+import {RkStyleSheet} from "react-native-ui-kitten";
 
 export class TakeDrugScreen extends React.Component {
 
     static navigationOptions = ({navigation}) => ({
         title: "今日服用",
-        tabBarIcon: ({tintColor,activeTintColor}) => (
+        tabBarIcon: ({tintColor, activeTintColor}) => (
             <Image source={require('../asserts/images/take_drug_plan.png')}
-                   style={{width:16,height:16,tintColor:tintColor,activeTintColor:'#8a8a8a'}}
+                   style={{width: 16, height: 16, tintColor: tintColor}}
             />
         ),
     });
@@ -59,6 +59,7 @@ export class TakeDrugScreen extends React.Component {
 
     _renderItem(rowItem) {
         var detail = this._renderItemProps(rowItem);
+        var key = new Date().getTime();
         return (
             <ListRow
                 style={styles.row}
@@ -74,6 +75,10 @@ export class TakeDrugScreen extends React.Component {
         );
     }
 
+    _extraUniqueKey(item, index) {
+        return "index" + index + item;
+    }
+
     render() {
 
         return (
@@ -82,6 +87,7 @@ export class TakeDrugScreen extends React.Component {
 
                 <FlatList
                     data={this.state.todayDrugs}
+                    keyExtractor={this._extraUniqueKey}
                     renderItem={this._renderItem}
                 />
             </ScrollView>

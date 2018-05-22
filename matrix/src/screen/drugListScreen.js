@@ -10,7 +10,7 @@ export class DrugListScreen extends React.Component {
         title: "药品管理",
         tabBarIcon: ({tintColor,activeTintColor}) => (
             <Image source={require('../asserts/images/drug_default.png')}
-                   style={{width: 16, height: 16, tintColor: tintColor, activeTintColor: activeTintColor}}
+                   style={{width: 16, height: 16, tintColor: tintColor}}
             />
         ),
     });
@@ -61,7 +61,7 @@ export class DrugListScreen extends React.Component {
                 icon={require('../asserts/images/drug_default.png')}
                 detail={detail}
                 swipeActions={[
-                    <ListRow.SwipeActionButton title='编辑' type='warn'
+                    <ListRow.SwipeActionButton title='编辑' type='default'
                                                onPress={() => alert('edit')}/>,
                     <ListRow.SwipeActionButton title='移除' type='danger'
                                                onPress={() => alert('Remove')}/>,

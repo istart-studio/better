@@ -15,12 +15,12 @@ export default class DrugService {
 
     static async newDrugs(drug) {
         console.log(drug);
-        var drugs = await this.getDrugs();
+        let drugs = await this.getDrugs();
 
-        var isNewDrug = true;
-        for (var i = 0; i < drugs.length; i++) {
+        let isNewDrug = true;
+        for (let i = 0; i < drugs.length; i++) {
             console.log(drug.drugName);
-            if (drugs[i].drugName == drug.drugName) {
+            if (drugs[i].drugName === drug.drugName) {
                 isNewDrug = false;
                 break;
             }
