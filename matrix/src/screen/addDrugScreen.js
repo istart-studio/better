@@ -28,14 +28,27 @@ export default class AddDrugScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = AddDrugScreen._initObject(props.navigation.state.drugInfo);
+        this.state = {};
+        this._initObject = this._initObject.bind(this);
         this._onSaveDrug = this._onSaveDrug.bind(this);
         this._changePlan = this._changePlan.bind(this);
         this.props.navigation.setParams({navigatePress: this._onSaveDrug})
 
     }
 
-    static _initObject(rawObject) {
+    componentWillMount() {
+        let drug = this.props.navigation.getParam('drugInfo');
+        this._initObject(drug);
+    }
+
+    componentWillReceiveProps(props){
+        console.log('componentWillReceiveProps');
+        let drug = props.navigation.getParam('drugInfo');
+        this.setState(drug);
+        // this._initObject(drug);
+    }
+
+    _initObject(rawObject) {
         let drugInfo = rawObject;
         if (!drugInfo) {
             drugInfo = DrugInfoModel.newModel();
@@ -43,7 +56,7 @@ export default class AddDrugScreen extends React.Component {
             drugInfo.plan.push(DrugInfoModel.newPlan("13", 1, drugInfo.quantity));
             drugInfo.plan.push(DrugInfoModel.newPlan("19", 1, drugInfo.quantity));
         }
-        return drugInfo;
+        this.setState(drugInfo);
     }
 
 
@@ -53,7 +66,7 @@ export default class AddDrugScreen extends React.Component {
             Toast.fail('药品名必须填写');
             return;
         }
-        DrugService.newDrugs(drugInfo).then(function (isNewDrug) {
+        DrugService.newDrugs(drugInfo).then(isNewDrug => {
             if (isNewDrug) {
                 Toast.success('保存成功');
                 this.props.navigation.goBack();
@@ -138,6 +151,8 @@ export default class AddDrugScreen extends React.Component {
     }
 
     render() {
+        // const passDrug = this.props.navigation.getParam('drugInfo');
+        // const drug = passDrug ? passDrug : this.state;
         const _renderPlan = this._renderPlan();
         return (
             <ScrollView style={styles.container}>

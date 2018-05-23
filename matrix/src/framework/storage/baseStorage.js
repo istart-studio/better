@@ -1,6 +1,4 @@
-import React, {
-    AsyncStorage
-} from 'react-native';
+import React, {AsyncStorage} from 'react-native';
 
 export default class BaseStorage {
     /**
@@ -32,9 +30,9 @@ export default class BaseStorage {
      * @returns {Promise<T>|Promise.<TResult>}
      */
     static update(key, value) {
-        return LocalStorage.get(key).then((item) => {
-            value = typeof value === 'string' ? value : Object.assign({}, item, value);
-            return AsyncStorage.setItem(key, JSON.stringify(value));
+        AsyncStorage.getItem(key).then((item) => {
+            // jsonValue = typeof jsonValue === 'string' ? jsonValue : Object.assign({}, item, jsonValue);
+            AsyncStorage.setItem(key, JSON.stringify(value));
         });
     }
 

@@ -1,14 +1,14 @@
 import React from 'react';
-import {StyleSheet, FlatList, Button, Text, View, TouchableOpacity, ScrollView, Image} from "react-native";
+import {FlatList, Image, ScrollView, View} from "react-native";
 import DrugService from "../service/drugService";
-import {Badge, Label, ListRow, NavigationBar, Theme} from "teaset";
-import {RkText, RkStyleSheet, RkCard} from "react-native-ui-kitten";
+import {Label, ListRow, Toast} from "teaset";
+import {RkStyleSheet} from "react-native-ui-kitten";
 
 export class DrugListScreen extends React.Component {
 
     static navigationOptions = ({navigation}) => ({
         title: "药品管理",
-        tabBarIcon: ({tintColor,activeTintColor}) => (
+        tabBarIcon: ({tintColor, activeTintColor}) => (
             <Image source={require('../asserts/images/drug_default.png')}
                    style={{width: 16, height: 16, tintColor: tintColor}}
             />
@@ -17,67 +17,83 @@ export class DrugListScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {todayDrugs: []}
-        this._loadingTodayDrugs = this._loadingTodayDrugs.bind(this);
+        this.state = {drugs: []};
+        this._initDrugs = this._initDrugs.bind(this);
+        DrugService.getDrugs = DrugService.getDrugs.bind(this);
+        this._editDrug = this._editDrug.bind(this);
+        this._deleteDrug = this._deleteDrug.bind(this);
+        DrugService.deleteDrug = DrugService.deleteDrug.bind(this);
         this._renderItem = this._renderItem.bind(this);
-        DrugService.getTodayDrugs().then(drugs => {
-            this._loadingTodayDrugs(drugs);
+    }
+
+    componentWillMount() {
+        this._initDrugs();
+    }
+
+    componentWillReceiveProps(props) {
+        console.log('componentWillReceiveProps');
+        this._initDrugs();
+    }
+
+    _initDrugs = function () {
+        DrugService.getDrugs().then(drugs => {
+            this.setState({drugs: drugs});
         });
-    }
+    };
 
-    componentDidMount() {
+    _editDrug = function (drug) {
+        const navigation = this.props.navigation;
+        navigation.navigate('AddDrug', {drugInfo: drug});
+    };
+    _deleteDrug = function (drug) {
+        DrugService.deleteDrug(drug).then(result => {
+            Toast.success("删除成功");
+            this._initDrugs();
+        });
 
-    }
+    };
 
-    _loadingTodayDrugs = function (drugs) {
-        console.log("_loadingTodayDrugs");
-        console.log(drugs);
-        this.setState({todayDrugs: [{}, {}, {}]});
-    }
-
-    _renderItemProps(rowItem) {
+    _renderItemProps(drug) {
+        let specification = drug.amount + "*" + drug.quantity;
         return (<View style={styles.row}>
             <View style={styles.propUnit}>
                 <Label style={styles.prop} type='title' size='xl' text='规格'/>
-                <Label style={styles.prop} type='title' size='xl' text='20*500mg'/>
+                <Label style={styles.prop} type='title' size='xl' text={specification}/>
             </View>
             <View style={styles.propUnit}>
                 <Label style={styles.prop} type='title' size='xl' text='厂商'/>
-                <Label style={styles.prop} type='title' size='xl' text='阿乐'/>
+                <Label style={styles.prop} type='title' size='xl' text={drug.vendor}/>
             </View>
             <View style={styles.propUnit}>
                 <Label style={styles.prop} type='title' size='xl' text='价格'/>
-                <Label style={styles.prop} type='title' size='xl' text='20'/>
+                <Label style={styles.prop} type='title' size='xl' text={drug.price}/>
             </View>
         </View>);
     }
 
     _renderItem(rowItem) {
-        var detail = this._renderItemProps(rowItem);
-        var info = {};
+        let drug = rowItem.item;
+        const detail = this._renderItemProps(drug);
         return (
             <ListRow
-                title={'阿莫西林胶囊'}
+                title={drug.drugName}
                 icon={require('../asserts/images/drug_default.png')}
                 detail={detail}
                 swipeActions={[
                     <ListRow.SwipeActionButton title='编辑' type='default'
-                                               onPress={() => alert('edit')}/>,
+                                               onPress={() => this._editDrug(drug)}/>,
                     <ListRow.SwipeActionButton title='移除' type='danger'
-                                               onPress={() => alert('Remove')}/>,
+                                               onPress={() => this._deleteDrug(drug)}/>,
                 ]}
                 titlePlace='top'/>
-
         );
     }
 
     render() {
-
         return (
             <ScrollView style={styles.container}>
-
                 <FlatList
-                    data={this.state.todayDrugs}
+                    data={this.state.drugs}
                     renderItem={this._renderItem}
                 />
             </ScrollView>
