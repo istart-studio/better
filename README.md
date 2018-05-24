@@ -17,3 +17,7 @@ npm install --save react-navigation
 npm install --save react-native-ui-kitten
 * https://github.com/rilyu/teaset
 npm install --save teaset
+
+### todo
+* 所有变量，参数进行类型说明
+* 自定义控件：验证及显示

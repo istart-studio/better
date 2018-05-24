@@ -1,8 +1,8 @@
 import React from 'react';
 import {FlatList, Image, ScrollView, TouchableOpacity, View} from "react-native";
-import DrugService from "../service/drugService";
 import {Label, ListRow} from "teaset";
 import {RkStyleSheet} from "react-native-ui-kitten";
+import TakeDrugService from "../service/takeDrugService";
 
 export class TakeDrugScreen extends React.Component {
 
@@ -17,40 +17,41 @@ export class TakeDrugScreen extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {todayDrugs: []}
+        this.state = {todayDrugs: []};
         this._loadingTodayDrugs = this._loadingTodayDrugs.bind(this);
         this._renderItem = this._renderItem.bind(this);
-        DrugService.getTodayDrugs().then(drugs => {
-            this._loadingTodayDrugs(drugs);
+    }
+
+    componentWillMount() {
+        this._loadingTodayDrugs();
+    }
+
+    _loadingTodayDrugs = function () {
+        TakeDrugService.getTodayDrugs().then(takeDrugs => {
+            console.log(takeDrugs);
+            this.setState({todayDrugs: takeDrugs});
         });
-    }
 
-    componentDidMount() {
+    };
 
-    }
-
-    _loadingTodayDrugs = function (drugs) {
-        console.log("_loadingTodayDrugs");
-        console.log(drugs);
-        this.setState({todayDrugs: [{drugName: '阿莫西林胶囊'}, {drugName: '阿莫西林胶囊-1'}, {drugName: '阿莫西林胶囊-2'}]});
-    }
-
-    _renderItemProps(rowItem) {
+    _renderItemProps(takeDrug) {
+        const specification = `${takeDrug.amount}*${takeDrug.quantity}`;
+        const taking = `${takeDrug.takeAmount}*${takeDrug.takeQuantity}`;
         return (<View style={{flex: 1, flexDirection: "row", justifyContent: 'space-between', alignItems: 'center',}}>
             <View style={styles.propBlock}>
                 <View style={styles.propUnit}>
                     <Label style={styles.prop} type='title' size='xl' text='规格'/>
-                    <Label style={styles.prop} type='title' size='xl' text='20*500mg'/>
+                    <Label style={styles.prop} type='title' size='xl' text={specification}/>
                 </View>
                 <View style={styles.propUnit}>
                     <Label style={styles.prop} type='title' size='xl' text='本次用量'/>
-                    <Label style={styles.prop} type='title' size='xl' text='1*500mg'/>
+                    <Label style={styles.prop} type='title' size='xl' text={taking}/>
                 </View>
             </View>
             <TouchableOpacity onPress={() => {
                 alert('take drug..')
             }}>
-                <Image style={{width: 32, height: 32, tintColor: '#8a6d3b'}}
+                <Image style={{width: 32, height: 32, tintColor: '#58AF0C'}}
                        source={require('../asserts/images/take_drug.png')}
                 />
             </TouchableOpacity>
@@ -58,17 +59,25 @@ export class TakeDrugScreen extends React.Component {
     }
 
     _renderItem(rowItem) {
-        var detail = this._renderItemProps(rowItem);
-        var key = new Date().getTime();
+        const takeDrug = rowItem.item;
+        const detail = this._renderItemProps(takeDrug);
+        let iconSrc = "";
+        if (takeDrug.planTime < 12) {
+            iconSrc = require("../asserts/images/morning.png");
+        } else if (takeDrug.planTime > 12 && takeDrug.planTime < 19) {
+            iconSrc = require("../asserts/images/noon.png");
+        } else {
+            iconSrc = require("../asserts/images/night.png");
+        }
         return (
             <ListRow
                 style={styles.row}
-                title={'阿莫西林胶囊'}
+                title={takeDrug.drugName}
                 titlePlace='top'
-                icon={require('../asserts/images/morning.png')}
+                icon={iconSrc}
                 detail={detail}
                 swipeActions={[
-                    <ListRow.SwipeActionButton title='暂不服用' type='danger'
+                    <ListRow.SwipeActionButton title='今日不服用' type='danger'
                                                onPress={() => alert('Remove')}/>,
                 ]}
             />
