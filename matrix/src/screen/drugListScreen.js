@@ -1,5 +1,5 @@
 import React from 'react';
-import {FlatList, Image, ScrollView, View} from "react-native";
+import {FlatList, Image, ScrollView, Text, View} from "react-native";
 import DrugService from "../service/drugService";
 import {Label, ListRow, Toast} from "teaset";
 import {RkStyleSheet} from "react-native-ui-kitten";
@@ -90,14 +90,20 @@ export class DrugListScreen extends React.Component {
     }
 
     render() {
-        return (
-            <ScrollView style={styles.container}>
-                <FlatList
-                    data={this.state.drugs}
-                    renderItem={this._renderItem}
-                />
-            </ScrollView>
-        );
+        if (this.state.drugs && this.state.drugs.length > 0) {
+            return (
+                <ScrollView style={styles.container}>
+                    <FlatList
+                        data={this.state.drugs}
+                        renderItem={this._renderItem}
+                    />
+                </ScrollView>
+            );
+        } else {
+            return (<View style={styles.blank_container}>
+                <Text style={styles.blank_content}>暂无管理药品</Text>
+            </View>);
+        }
     }
 }
 
@@ -107,6 +113,17 @@ let styles = RkStyleSheet.create(theme => ({
         backgroundColor: 'white',
         paddingTop: 65,
         paddingHorizontal: 14,
+    },
+    blank_container: {
+        backgroundColor: 'white',
+        paddingTop: 65,
+        paddingHorizontal: 14,
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    blank_content: {
+        color: '#c7c7c7'
     },
     row: {
         flex: 1,

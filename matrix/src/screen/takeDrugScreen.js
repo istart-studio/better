@@ -1,5 +1,5 @@
 import React from 'react';
-import {FlatList, Image, ScrollView, TouchableOpacity, View} from "react-native";
+import {FlatList, Image, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import {Label, ListRow} from "teaset";
 import {RkStyleSheet} from "react-native-ui-kitten";
 import TakeDrugService from "../service/takeDrugService";
@@ -24,6 +24,10 @@ export class TakeDrugScreen extends React.Component {
     }
 
     componentWillMount() {
+        this._loadingTodayDrugs();
+    }
+
+    componentWillReceiveProps(props) {
         this._loadingTodayDrugs();
     }
 
@@ -105,24 +109,37 @@ export class TakeDrugScreen extends React.Component {
         );
     }
 
+    _hasTakeDrugs(drugs) {
+        let showCount = 0;
+        drugs.forEach(drug => {
+            if (drug.state === 0) {
+                showCount++;
+            }
+        })
+        return showCount !== drugs.length;
+    }
+
     _extraUniqueKey(item, index) {
         return "index" + index + item;
     }
 
     render() {
 
-        return (
-            <ScrollView
-                style={styles.container}>
-
-                <FlatList
-                    data={this.state.todayDrugs}
-                    extraData={this.state}
-                    keyExtractor={this._extraUniqueKey}
-                    renderItem={this._renderItem}
-                />
-            </ScrollView>
-        );
+        let content = <ScrollView
+            style={styles.container}>
+            <FlatList
+                data={this.state.todayDrugs}
+                extraData={this.state}
+                keyExtractor={this._extraUniqueKey}
+                renderItem={this._renderItem}
+            />
+        </ScrollView>;
+        if (this._hasTakeDrugs(this.state.todayDrugs)) {
+            content = <View style={styles.blank_container}>
+                <Text style={styles.blank_content}>今日无可用之药</Text>
+            </View>;
+        }
+        return (content);
     }
 }
 
@@ -132,6 +149,17 @@ let styles = RkStyleSheet.create(theme => ({
         backgroundColor: 'white',
         paddingTop: 65,
         paddingHorizontal: 14,
+    },
+    blank_container: {
+        backgroundColor: 'white',
+        paddingTop: 65,
+        paddingHorizontal: 14,
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center'
+    },
+    blank_content: {
+        color:'#c7c7c7'
     },
     row: {
         flex: 1,
@@ -149,9 +177,6 @@ let styles = RkStyleSheet.create(theme => ({
         flexDirection: 'row',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        // borderBottomWidth: 0.2,//StyleSheet.hairlineWidth,
-        // borderColor: theme.colors.border.base,
-        // paddingVertical: 5,
         marginVertical: 4,
         marginHorizontal: 4,
     },

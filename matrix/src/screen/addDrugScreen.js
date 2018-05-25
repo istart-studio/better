@@ -41,7 +41,7 @@ export default class AddDrugScreen extends React.Component {
         this._initObject(drug);
     }
 
-    componentWillReceiveProps(props){
+    componentWillReceiveProps(props) {
         console.log('componentWillReceiveProps');
         let drug = props.navigation.getParam('drugInfo');
         this.setState(drug);
@@ -124,8 +124,9 @@ export default class AddDrugScreen extends React.Component {
                             element.quantity = text;
                             this._changePlan(element);
                         }}
-                        value={element.quantity}
+                        value={this.state.quantity}
                         placeholder={"0.5mg"}
+                        disabled={true}
                     />
                     <Label
                         style={{flex: 1, paddingLeft: 2, paddingRight: 2}}
@@ -151,8 +152,6 @@ export default class AddDrugScreen extends React.Component {
     }
 
     render() {
-        // const passDrug = this.props.navigation.getParam('drugInfo');
-        // const drug = passDrug ? passDrug : this.state;
         const _renderPlan = this._renderPlan();
         return (
             <ScrollView style={styles.container}>
