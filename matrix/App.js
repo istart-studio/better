@@ -1,19 +1,17 @@
 import React from 'react';
-import {
-    StackNavigator, TabNavigator,
-} from 'react-navigation';
+import {createBottomTabNavigator,} from 'react-navigation';
 import {bootstrap} from "./src/config/bootstrap";
 import {DrugListScreen} from "./src/screen/drugListScreen";
 import AddDrugScreen from "./src/screen/addDrugScreen";
 import {TakeDrugScreen} from "./src/screen/takeDrugScreen";
-import {Image, View} from "react-native";
-import {RkStyleSheet} from "react-native-ui-kitten";
-import DrugService from "./src/service/drugService";
+// import {YellowBox} from 'react-native';
 
+// ignore some warnings
+// YellowBox.ignoreWarnings(['Warning', 'Module RCTImageLoader']);
 
 bootstrap();
 // DrugService.clearDrugs();
-const App = TabNavigator({
+const App = createBottomTabNavigator({
     TakeDrug: {
         screen: TakeDrugScreen,
     },
@@ -27,7 +25,7 @@ const App = TabNavigator({
     },
     labelStyle: {
         fontSize: 20, // 文字大小
-        fontColor:'#8a8a8a'
+        fontColor: '#8a8a8a'
     },
 });
 export default App;

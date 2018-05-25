@@ -89,11 +89,16 @@ export class DrugListScreen extends React.Component {
         );
     }
 
+    _extraUniqueKey(item, index) {
+        return "index" + index + item;
+    }
+
     render() {
         if (this.state.drugs && this.state.drugs.length > 0) {
             return (
                 <ScrollView style={styles.container}>
                     <FlatList
+                        keyExtractor={this._extraUniqueKey}
                         data={this.state.drugs}
                         renderItem={this._renderItem}
                     />
