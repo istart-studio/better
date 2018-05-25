@@ -8,8 +8,9 @@ export default class TakeDrugRecordModel {
             takeAmount: plan.amount,
             takeQuantity: plan.quantity,
             planTime: plan.time,
+            createTime:new Date().getTime(),
             takeTime: 0,
-            enable: true
+            state: 0//0:未使用(进行显示)，1：使用，-1：放弃
         }
     };
 }

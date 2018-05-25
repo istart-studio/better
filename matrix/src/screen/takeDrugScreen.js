@@ -19,6 +19,7 @@ export class TakeDrugScreen extends React.Component {
         super(props);
         this.state = {todayDrugs: []};
         this._loadingTodayDrugs = this._loadingTodayDrugs.bind(this);
+        this._takeDrug = this._takeDrug.bind(this);
         this._renderItem = this._renderItem.bind(this);
     }
 
@@ -31,10 +32,21 @@ export class TakeDrugScreen extends React.Component {
             console.log(takeDrugs);
             this.setState({todayDrugs: takeDrugs});
         });
+    };
 
+    _takeDrug = function (record, state) {
+        TakeDrugService.take(record, state).then(result => {
+            this.state.todayDrugs.forEach(todayDrug => {
+                if (record.drugName === todayDrug.drugName && record.planTime === todayDrug.planTime) {
+                    todayDrug.state = state;
+                }
+            });
+            this.setState({todayDrugs: this.state.todayDrugs});
+        });
     };
 
     _renderItemProps(takeDrug) {
+        console.log("show detail!");
         const specification = `${takeDrug.amount}*${takeDrug.quantity}`;
         const taking = `${takeDrug.takeAmount}*${takeDrug.takeQuantity}`;
         return (<View style={{flex: 1, flexDirection: "row", justifyContent: 'space-between', alignItems: 'center',}}>
@@ -49,7 +61,7 @@ export class TakeDrugScreen extends React.Component {
                 </View>
             </View>
             <TouchableOpacity onPress={() => {
-                alert('take drug..')
+                this._takeDrug(takeDrug, 1);
             }}>
                 <Image style={{width: 32, height: 32, tintColor: '#58AF0C'}}
                        source={require('../asserts/images/take_drug.png')}
@@ -60,7 +72,14 @@ export class TakeDrugScreen extends React.Component {
 
     _renderItem(rowItem) {
         const takeDrug = rowItem.item;
-        const detail = this._renderItemProps(takeDrug);
+        let detail = "";
+        console.log(takeDrug);
+        if (takeDrug.state === 0) {
+            detail = this._renderItemProps(takeDrug);
+        } else {
+            console.log("no show!");
+            return;
+        }
         let iconSrc = "";
         if (takeDrug.planTime < 12) {
             iconSrc = require("../asserts/images/morning.png");
@@ -78,7 +97,9 @@ export class TakeDrugScreen extends React.Component {
                 detail={detail}
                 swipeActions={[
                     <ListRow.SwipeActionButton title='今日不服用' type='danger'
-                                               onPress={() => alert('Remove')}/>,
+                                               onPress={() => {
+                                                   this._takeDrug(takeDrug, -1);
+                                               }}/>,
                 ]}
             />
         );
@@ -96,6 +117,7 @@ export class TakeDrugScreen extends React.Component {
 
                 <FlatList
                     data={this.state.todayDrugs}
+                    extraData={this.state}
                     keyExtractor={this._extraUniqueKey}
                     renderItem={this._renderItem}
                 />

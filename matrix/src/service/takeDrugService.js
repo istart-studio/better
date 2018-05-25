@@ -12,6 +12,7 @@ export default class TakeDrugService {
      */
     static async getTodayDrugs() {
         let drugPlans = [];
+        //从药品计划中获取今日预计用药
         const drugs = await DrugService.getDrugs();
         for (const index in drugs) {
             const drug = drugs[index];
@@ -22,14 +23,32 @@ export default class TakeDrugService {
                 }
             })
         }
-
-
-        let drugRecords = await TakeDrugService.getRecords();
+        //根据今日的用药记录匹配未服用的用药计划
+        const drugRecords = await TakeDrugService.getRecords();
+        const now = new Date();
+        const today = new Date();
+        today.setFullYear(now.getFullYear(), now.getMonth(), now.getDate());
+        today.setHours(0,0,0,0);
+        const tomorrow = new Date();
+        tomorrow.setFullYear(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+        tomorrow.setHours(0,0,0,0);
+        const startTimeStamp = today.getTime();
+        const endTimeStamp = tomorrow.getTime();
         for (const index in drugRecords) {
-            const record = drugRecords[index];
-            //todo:已经服用的药品不在出现今日用药列表中(服用，本次不服用)
+            const todayDrugRecord = drugRecords[index];
+            if (todayDrugRecord.createTime >= startTimeStamp && todayDrugRecord.createTime <= endTimeStamp) {
+                //已经用过不再提醒
+                drugPlans.forEach(drugPlan => {
+                    if (todayDrugRecord.drugName === drugPlan.drugName
+                        && todayDrugRecord.takeAmount === drugPlan.takeAmount
+                        && todayDrugRecord.takeQuantity === drugPlan.takeQuantity) {
+                        drugPlan.state = todayDrugRecord.state;
+                    }
+                });
+            }
         }
 
+        //排序
         drugPlans.sort((a, b) => {
             return parseFloat(a.planTime) - parseFloat(b.planTime);
         });
@@ -38,30 +57,33 @@ export default class TakeDrugService {
         return drugPlans;
     }
 
-    static async take(drugRecord) {
+    static async take(drugRecord, abandon) {
         let drugPlans = await TakeDrugService.getTodayDrugs();
         for (let index in drugPlans) {
             const drugPlan = drugPlans[index];
             if (drugPlan.drugName === drugRecord.drugName &&
                 drugPlan.planTime === drugRecord.planTime) {
 
-                drugPlan.takeTime = new Date();
-
-                drugRecord.takeTime = new Date();
-
+                if (abandon !== -1) {
+                    drugRecord.state = 1;
+                    drugRecord.takeTime = new Date();
+                } else {
+                    drugRecord.state = -1;
+                }
                 TakeDrugService.saveRecord(drugRecord);
             }
         }
-        BaseStorage.update(TODAY_PLAN_KEY,)
     }
 
     static async getRecords() {
-        return BaseStorage.get(RECORDS_KEY);
+        return await BaseStorage.get(RECORDS_KEY).then(records => {
+            return JSON.parse(records);
+        });
     }
 
     static async saveRecord(drugRecord) {
         console.log(drugRecord);
-        BaseStorage.get(RECORDS_KEY).then(records => {
+        TakeDrugService.getRecords().then(records => {
             if (!records) {
                 records = [];
             }
