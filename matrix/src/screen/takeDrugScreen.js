@@ -116,7 +116,7 @@ export class TakeDrugScreen extends React.Component {
                 showCount++;
             }
         })
-        return showCount !== drugs.length;
+        return showCount == 0;
     }
 
     _extraUniqueKey(item, index) {
@@ -124,7 +124,6 @@ export class TakeDrugScreen extends React.Component {
     }
 
     render() {
-
         let content = <ScrollView
             style={styles.container}>
             <FlatList

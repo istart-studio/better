@@ -50,7 +50,6 @@ export class DrugListScreen extends React.Component {
             Toast.success("删除成功");
             this._initDrugs();
         });
-
     };
 
     _renderItemProps(drug) {
