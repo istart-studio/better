@@ -76,6 +76,15 @@ export default class AddDrugScreen extends React.Component {
         })
     };
 
+    _initPlan(quantity) {
+        this.state.plan.forEach(item => {
+            if (!item.quantity || item.quantity !== "") {
+                item.quantity = quantity;
+            }
+        });
+        this.setState({plan: this.state.plan});
+    }
+
     _changePlan(element) {
         this.state.plan.forEach(item => {
             if (item.time === element.time) {
@@ -124,8 +133,7 @@ export default class AddDrugScreen extends React.Component {
                             element.quantity = text;
                             this._changePlan(element);
                         }}
-                        value={this.state.quantity}
-                        placeholder={"0.5mg"}
+                        value={element.quantity}
                         disabled={true}
                     />
                     <Label
@@ -190,7 +198,10 @@ export default class AddDrugScreen extends React.Component {
                                     <Input
                                         style={{flex: 2}}
                                         size='sm'
-                                        onChangeText={(text) => this.setState({quantity: text})}
+                                        onChangeText={(text) => {
+                                            this.setState({quantity: text});
+                                            this._initPlan(text);
+                                        }}
                                         value={String(this.state.quantity)}
                                         placeholder={"0.5mg"}
                                     />

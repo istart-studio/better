@@ -51,8 +51,8 @@ export class TakeDrugScreen extends React.Component {
 
     _renderItemProps(takeDrug) {
         console.log("show detail!");
-        const specification = `${takeDrug.amount}*${takeDrug.quantity}`;
-        const taking = `${takeDrug.takeAmount}*${takeDrug.takeQuantity}`;
+        const specification = `${takeDrug.amount} * ${takeDrug.quantity}`;
+        const taking = `${takeDrug.takeAmount} * ${takeDrug.takeQuantity}`;
         return (<View style={{flex: 1, flexDirection: "row", justifyContent: 'space-between', alignItems: 'center',}}>
             <View style={styles.propBlock}>
                 <View style={styles.propUnit}>
